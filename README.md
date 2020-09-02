@@ -1,17 +1,18 @@
 # Img Style Transfer for Data Augmentation
 
-This project aims to test the data augmentation, especially the color transfer for the img of car driving in paper listed below.
+This project aims to test the data augmentation, especially the color transfer for the img of car driving in different weather situation.  Reference papers and code were listed below:
+1. Forked from https://github.com/enomotokenji/pytorch-Neural-Style-Transfer
 
-1.	Mikolajczyk A , Grochowski M . Data augmentation for improving deep learning in image classification problem[C]// International Interdisciplinary Phd Workshop. IEEE, 2018:117-122.
+2.	Mikolajczyk A , Grochowski M . Data augmentation for improving deep learning in image classification problem[C]// International Interdisciplinary Phd Workshop. IEEE, 2018:117-122.
 
-2.	Gatys L A , Ecker A S , Bethge M . Image Style Transfer Using Convolutional Neural Networks[C]// Computer Vision & Pattern Recognition. IEEE, 2016.
+3.	Gatys L A , Ecker A S , Bethge M . Image Style Transfer Using Convolutional Neural Networks[C]// Computer Vision & Pattern Recognition. IEEE, 2016.
 
 ## Test
 content: morning_cloud
 
 style: noon_sun / night
 
-<img src='example/morning_cloud.jpg' title='Content Image' width='30%'> <img src='example/noon_sun.jpg' titile='Style Image1' width='30%'> <img src='example/night.jpg' title='Style Image2' width='30%'>
+<img src='example/morning_cloud.jpg' title='Content Image' width='30%'> <img src='example/noon_sun.jpg' titile='Style Image1' width='30%'> <img src='example/shanghai_night.jpg' title='Style Image2' width='30%'>
 
 ### Transfer the color style of noon_sun to morning_cloud 
 morning_cloud + part of noon_sun with 500 epochs and content_weight:style_weight = 1:400
@@ -32,7 +33,8 @@ suggest that use the part of img which you want the network to learn, but not th
 
 <img src='example/morning_cloud-noon_sun-500-100.jpg' title='Results'>
 
-# How to use
+## How to use
+### Style transfer for color augmentation 
 in style_transfer.py, change some argms:
 ```python
 epoch = 500
@@ -41,3 +43,5 @@ style_weight = 150  # 40
 initialize_noise = False
 cuda = True
 ```
+### Cut the img
+use the cut_img.py
