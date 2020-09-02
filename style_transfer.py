@@ -18,31 +18,52 @@ import argparse
 from loss import ContentLoss, GramMatrix, StyleLoss
 from utils import image_loader, image_loader_gray, save_image
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--content', '-c', type=str, required=True, help='The path to the Content image')
-parser.add_argument('--style', '-s', type=str, required=True, help='The path to the style image')
-parser.add_argument('--epoch', '-e', type=int, default=300, help='The number of epoch')
-parser.add_argument('--content_weight', '-c_w', type=int, default=1, help='The weight of content loss')
-parser.add_argument('--style_weight', '-s_w', type=int, default=500, help='The weight of style loss')
-parser.add_argument('--initialize_noise', '-i_n', action='store_true', help='Initialize with white noise? elif initialize with content image')
-parser.add_argument('--cuda', action='store_true', help='use cuda?')
-args = parser.parse_args()
+# parser = argparse.ArgumentParser()
+# parser.add_argument('--content', '-c', type=str, required=True, help='The path to the Content image')
+# parser.add_argument('--style', '-s', type=str, required=True, help='The path to the style image')
+# parser.add_argument('--epoch', '-e', type=int, default=300, help='The number of epoch')
+# parser.add_argument('--content_weight', '-c_w', type=int, default=1, help='The weight of content loss')
+# parser.add_argument('--style_weight', '-s_w', type=int, default=500, help='The weight of style loss')
+# parser.add_argument('--initialize_noise', '-i_n', action='store_true', help='Initialize with white noise? elif initialize with content image')
+# parser.add_argument('--cuda', action='store_true', help='use cuda?')
+# args = parser.parse_args()
 
-use_cuda = torch.cuda.is_available() and args.cuda
+content = "./example/morning_cloud.jpg"
+style = "./example/night_cut_2.jpg"
+
+# import cv2
+#
+# style = cv2.imread(style)
+# bbox = cv2.selectROI(style, False)
+# cut = style[bbox[1]:bbox[1]+bbox[3], bbox[0]:bbox[0]+bbox[2]]
+# cv2.imwrite('cut.jpg', cut)
+
+
+epoch = 500
+content_weight = 1
+style_weight = 150  # 40
+initialize_noise = False
+cuda = True
+
+
+use_cuda = torch.cuda.is_available() and cuda
 dtype = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
 
 # desired size of the output image
 imsize = 512 if use_cuda else 128  # use small size if no gpu
+imsize = 512
 
-style_img = image_loader(args.style, imsize).type(dtype)
-content_img = image_loader_gray(args.content, imsize).type(dtype)
+# style_img = image_loader(args.style, imsize).type(dtype)
+# content_img = image_loader_gray(args.content, imsize).type(dtype)
+style_img = image_loader(style, imsize).type(dtype)
+content_img = image_loader_gray(content, imsize).type(dtype)
 
-if args.initialize_noise:
+if initialize_noise:
     input_img = Variable(torch.randn(content_img.data.size())).type(dtype)
 else:
-    input_img = image_loader_gray(args.content, imsize).type(dtype)
+    input_img = image_loader_gray(content, imsize).type(dtype)
 
-input_size = Image.open(args.content).size
+input_size = Image.open(content).size
 
 assert style_img.size() == content_img.size(), \
     "we need to import style and content images of the same size"
@@ -155,7 +176,7 @@ def run_style_transfer(cnn, content_img, style_img, input_img, num_steps=300, st
             run[0] += 1
             if run[0] % 50 == 0:
                 print("run {}:".format(run))
-                print('Style Loss : {:4f} Content Loss: {:4f}'.format(style_score.data[0], content_score.data[0]))
+                print('Style Loss : {:4f} Content Loss: {:4f}'.format(style_score.item(), content_score.item()))
 
             return style_score + content_score
 
@@ -166,12 +187,10 @@ def run_style_transfer(cnn, content_img, style_img, input_img, num_steps=300, st
 
     return input_param.data
 
-output = run_style_transfer(cnn, content_img, style_img, input_img, args.epoch, args.style_weight, args.content_weight)
+output = run_style_transfer(cnn, content_img, style_img, input_img, epoch, style_weight, content_weight)
 
-name_content, ext = os.path.splitext(os.path.basename(args.content))
-name_style, _ = os.path.splitext(os.path.basename(args.style))
+name_content, ext = os.path.splitext(os.path.basename(content))
+name_style, _ = os.path.splitext(os.path.basename(style))
 fname = name_content+'-'+name_style+ext
 
 save_image(output, size=input_img.data.size()[1:], input_size=input_size, fname=fname)
-
-
