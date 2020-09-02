@@ -8,6 +8,9 @@ This project aims to test the data augmentation, especially the color transfer f
 
 # Test
 content: morning_cloud
+
+<img src = 'example/morning_cloud.jpg' title='Content Image' width='50%'> 
+
 style: noon_sun / night
 
-<img src = 'example/morning_cloud.jpg' title='Content Image' width='30%'> <img src='example/noon_sun.jpg' titile='Style Image1' width='30%'> <img src='example/night.jpg' title='Style Image2' width='30%'>
+<img src='example/noon_sun.jpg' titile='Style Image1' width='50%'> <img src='example/night.jpg' title='Style Image2' width='50%'>
